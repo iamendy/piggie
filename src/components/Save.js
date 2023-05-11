@@ -1,4 +1,10 @@
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
+
 const Save = () => {
+  const { openConnectModal } = useConnectModal();
+  const { isConnected } = useAccount();
+
   return (
     <div className="w-[90%] lg:max-w-2xl mx-auto">
       <div className="p-5 bg-dark rounded-md lg:p-8 xl:p-9 min-h-9xl">
@@ -38,9 +44,20 @@ const Save = () => {
           </div>
 
           <div>
-            <button className="bg-blue-400 hover:bg-blue-500 active:bg-blue-600 rounded-md p-5 block w-full">
-              Connect
-            </button>
+            {isConnected ? (
+              <button className="bg-blue-400 hover:bg-blue-500 active:bg-blue-600 rounded-md p-5 block w-full">
+                Create Piggy
+              </button>
+            ) : (
+              openConnectModal && (
+                <button
+                  className="bg-blue-400 hover:bg-blue-500 active:bg-blue-600 rounded-md p-5 block w-full"
+                  onClick={openConnectModal}
+                >
+                  Connect Wallet
+                </button>
+              )
+            )}
           </div>
         </div>
       </div>

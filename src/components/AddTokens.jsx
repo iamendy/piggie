@@ -1,6 +1,11 @@
 import Close from "../components/icons/Close";
-
+import SignOut from "../components/icons/SignOut";
+import { useDisconnect, useAccount } from "wagmi";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 const AddTokens = ({ toggle, setToggle }) => {
+  const { disconnect } = useDisconnect();
+  const { isConnected } = useAccount();
+  const { openConnectModal } = useConnectModal();
   return (
     <section
       className={`${
@@ -21,10 +26,35 @@ const AddTokens = ({ toggle, setToggle }) => {
             />
           </div>
           <div>
-            <button className="bg-blue-300 hover:bg-blue-500 active:bg-blue-600 rounded-md p-3 block w-full">
-              Connect
-            </button>
+            {isConnected ? (
+              <button className="bg-blue-300 hover:bg-blue-500 active:bg-blue-600 rounded-md p-3 block w-full">
+                Mint
+              </button>
+            ) : (
+              openConnectModal && (
+                <button
+                  className="bg-blue-300 hover:bg-blue-500 active:bg-blue-600 rounded-md p-3 block w-full"
+                  onClick={() => openConnectModal()}
+                >
+                  Connect
+                </button>
+              )
+            )}
           </div>
+        </div>
+        <div className="absolute bottom-24 lg:bottom-32 right-0 px-4 w-full">
+          {isConnected && (
+            <button
+              className="text-red-400 p-3 rounded-md w-full flex items-center justify-center space-x-2"
+              onClick={() => {
+                disconnect();
+                setToggle(!toggle);
+              }}
+            >
+              <span>Disconnect</span>
+              <SignOut />
+            </button>
+          )}
         </div>
       </div>
     </section>

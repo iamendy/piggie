@@ -18,7 +18,7 @@ function App({ Component, pageProps }) {
   React.useEffect(() => setMounted(true), []);
   return (
     <WagmiConfig client={client}>
-      <RainbowKitProvider chains={chains}>
+      <RainbowKitProvider chains={chains} modalSize="compact">
         <NextHead>
           <title>Piggie</title>
         </NextHead>

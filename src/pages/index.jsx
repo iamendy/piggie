@@ -1,17 +1,26 @@
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
+import { useAccount, useContractRead } from "wagmi";
 import Rainy from "../components/Rainy";
-import { Account } from "../components";
 import Save from "../components/Save";
 import CountDown from "../components/CountDown";
 import Navbar from "../components/Navbar";
 import { useState } from "react";
 import AddTokens from "../components/AddTokens";
+import config from "../config";
 
 function Page() {
   const { isConnected } = useAccount();
   const [toggle, setToggle] = useState(false);
   const [step, setStep] = useState(1);
+
+  const { data, isSuccess, isError, error } = useContractRead({
+    address: config.contract.address,
+    abi: config.contract.abi,
+    functionName: "getRecord",
+  });
+
+  isSuccess && console.log(data);
+  isError && console.log(error.reason);
+
   return (
     <main className="relative overflow-hidden min-h-screen font-inter">
       <Navbar setToggle={setToggle} toggle={toggle} />

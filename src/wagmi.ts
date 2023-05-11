@@ -1,15 +1,15 @@
 import { getDefaultWallets } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient } from "wagmi";
-import { sepolia } from "wagmi/chains";
+import { celoAlfajores } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 
 const { chains, provider, webSocketProvider } = configureChains(
-  [sepolia],
+  [celoAlfajores],
   [publicProvider()]
 );
 
 const { connectors } = getDefaultWallets({
-  appName: "My wagmi + RainbowKit App",
+  appName: "Piggie on Celo ❤️",
   chains,
 });
 

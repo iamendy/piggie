@@ -9,7 +9,7 @@ const Navbar = ({ toggle, setToggle }) => {
       <h3 className="font-bold tracking-loose text-xl uppercase p-4">Piggie</h3>
 
       <div className="flex items-center justify-center bg-dark rounded-md p-1 space-x-1">
-        <span className="">online</span>
+        <span className="">{isConnected ? "online" : "offline"}</span>
         <div
           className={`rounded-full w-2 h-2 text-xs ${
             isConnected ? "bg-green-500" : "bg-red-500"

@@ -31,17 +31,18 @@ const BreakPiggy = ({ expiresAt }) => {
   return (
     <div className="">
       <span className="text-xs text-red-300">
-        You can only break piggy after countdown
+        *You can only break piggy after countdown
       </span>
       <button
         className={`${
           parseInt(Date.now() / 1000) >= parseInt(expiresAt)
-            ? "bg-blue-600"
-            : "bg-grayed"
-        }  rounded-md p-5 block w-full`}
+            ? "bg-blue-600 visible"
+            : "bg-grayed invisible"
+        }  rounded-md p-5 hover:bg-blue-700 active:bg-blue-600 block w-full disabled:bg-grayed`}
         onClick={() => breakNow?.()}
+        disabled={isBreaking || isLoadingTx}
       >
-        Break Piggy 🔨
+        {isBreaking ? "Breaking Piggy.. 🔨" : "Break Piggy 🔨"}
       </button>
     </div>
   );

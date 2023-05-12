@@ -9,11 +9,15 @@ import {
   useContractWrite,
   usePrepareContractWrite,
 } from "wagmi";
+import { useState } from "react";
+import useDebounce from "../hooks/useDebounce";
 
 const AddTokens = ({ toggle, setToggle }) => {
   const { disconnect } = useDisconnect();
   const { isConnected, address } = useAccount();
   const { openConnectModal } = useConnectModal();
+  const [amount, setAmount] = useState("");
+  const debouncedAmount = useDebounce(amount, 500);
 
   const {
     config: mintConfig,
@@ -24,15 +28,20 @@ const AddTokens = ({ toggle, setToggle }) => {
     address: config.token.address,
     abi: config.token.abi,
     functionName: "mint",
-    args: [ethers.utils.parseEther("10000")],
-    //enabled: false,
+    args: [ethers.utils.parseEther(debouncedAmount || "0")],
   });
 
   const {
     write: mint,
     isLoading: isMinting,
     isSuccess: mintSuccessful,
-  } = useContractWrite(mintConfig);
+  } = useContractWrite({
+    ...mintConfig,
+    onSuccess: () => {
+      setAmount("");
+      setToggle(!toggle);
+    },
+  });
 
   return (
     <section
@@ -43,8 +52,7 @@ const AddTokens = ({ toggle, setToggle }) => {
       <div className="absolute w-3/4 lg:w-1/4 top-0 right-0 h-full bg-dark shadow drop-shadow-md p-5">
         <Close toggle={toggle} setToggle={setToggle} />
         <p className="text-grayed">
-          {" "}
-          Claim free tokens <br /> {address}{" "}
+          Claim free Piggy tokens <br />
         </p>
 
         <div className="mt-5 space-y-4">
@@ -55,12 +63,14 @@ const AddTokens = ({ toggle, setToggle }) => {
               placeholder="200"
               type="text"
               disabled={isMinting}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
             />
           </div>
           <div>
             {isConnected ? (
               <button
-                className="bg-blue-300 hover:bg-blue-500 active:bg-blue-600 disabled:bg-grayed rounded-md p-3 block w-full"
+                className="bg-blue-400 hover:bg-blue-500 active:bg-blue-600 disabled:bg-grayed rounded-md p-3 block w-full"
                 onClick={() => mint()}
                 disabled={isMinting}
               >

@@ -29,8 +29,6 @@ function Page() {
     watch: true,
   });
 
-  balance && console.log(balance);
-
   return (
     <main className="relative overflow-hidden min-h-screen font-inter">
       <Navbar setToggle={setToggle} toggle={toggle} />
@@ -43,7 +41,7 @@ function Page() {
           </div>
         </div>
 
-        {record.status == 0 ? (
+        {record?.status == 0 ? (
           <Save record={record} balance={balance} />
         ) : (
           <CountDownSection record={record} balance={balance} />

@@ -9,22 +9,15 @@ import {
 import config from "../config";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
+import useDebounce from "../hooks/useDebounce";
 
-const Save = ({ record, isLoading }) => {
+const Save = ({ record, balance }) => {
   const { openConnectModal } = useConnectModal();
   const { isConnected, address } = useAccount();
   const [amount, setAmount] = useState("");
   const [duration, setDuration] = useState("");
-
-  //Get Token Balance
-  const { data: balance, isLoading: isGettingBalance } = useContractRead({
-    address: config.token.address,
-    abi: config.token.abi,
-    functionName: "balanceOf",
-    args: [address],
-  });
-
-  record && console.log(record);
+  const debouncedAmount = useDebounce(amount, 500);
+  const debouncedDuration = useDebounce(duration, 500);
 
   const {
     config: approveConfig,
@@ -35,8 +28,10 @@ const Save = ({ record, isLoading }) => {
     address: config.token.address,
     abi: config.token.abi,
     functionName: "approve",
-    args: [config.contract.address, ethers.utils.parseEther("50")],
-    //enabled: false,
+    args: [
+      config.contract.address,
+      ethers.utils.parseEther(debouncedAmount || "0"),
+    ],
   });
   const {
     data: approveData,
@@ -51,7 +46,7 @@ const Save = ({ record, isLoading }) => {
 
   useEffect(() => {
     if (isApprovedSuccess == true) {
-      createPiggy();
+      createPiggy?.();
     }
   }, [isApprovedSuccess]);
 
@@ -64,8 +59,10 @@ const Save = ({ record, isLoading }) => {
     address: config.contract.address,
     abi: config.contract.abi,
     functionName: "createPiggy",
-    args: [ethers.utils.parseEther("50"), parseInt(60)],
-    //enabled: false,
+    args: [
+      ethers.utils.parseEther(debouncedAmount || "0"),
+      parseInt(debouncedDuration),
+    ],
   });
 
   const {
@@ -81,13 +78,9 @@ const Save = ({ record, isLoading }) => {
           <div className="flex flex-col">
             <span className="text-gray text-xs lg:text-sm">Savings (PTK)</span>
             <span className="text-2xl lg:text-4xl font-extrabold">
-              {isLoading ? (
-                <p> Loading</p>
-              ) : record && record.length > 0 ? (
-                ethers.utils.formatEther(record?.balance)
-              ) : (
-                "0.00"
-              )}
+              {record.balance > 0
+                ? ethers.utils.formatEther(record?.balance)
+                : "0.0"}
             </span>
           </div>
 
@@ -96,13 +89,7 @@ const Save = ({ record, isLoading }) => {
               Balance (PTK)
             </span>
             <span className="text-2xl lg:text-4xl font-extrabold ml-auto">
-              {isGettingBalance ? (
-                <p> Loading</p>
-              ) : balance && balance > 0 ? (
-                ethers.utils.formatEther(balance)
-              ) : (
-                "0.00"
-              )}
+              {balance > 0 ? ethers.utils.formatEther(balance) : "0.0"}
             </span>
           </div>
         </div>
@@ -114,7 +101,9 @@ const Save = ({ record, isLoading }) => {
               className="py-3 px-0 focus:outline-none bg-transparent"
               placeholder="200"
               type="text"
-              disabled={isLoadingTx || isWriting}
+              disabled={isLoadingTx || isWriting || !isConnected}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
             />
           </div>
 
@@ -124,7 +113,9 @@ const Save = ({ record, isLoading }) => {
               className="py-3 px-0 focus:outline-none bg-transparent"
               placeholder="5 days"
               type="text"
-              disabled={isLoadingTx || isWriting}
+              disabled={isLoadingTx || isWriting || !isConnected}
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
             />
           </div>
 
@@ -132,10 +123,12 @@ const Save = ({ record, isLoading }) => {
             {isConnected ? (
               <button
                 className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-grayed rounded-md p-5 block w-full"
-                onClick={() => approve()}
+                onClick={() => approve?.()}
                 disabled={isLoadingTx || isWriting || isCreatingPiggy}
               >
-                Create Piggy
+                {isLoadingTx || isWriting || isCreatingPiggy
+                  ? "Creating Piggy.."
+                  : "Create Piggy"}
               </button>
             ) : (
               openConnectModal && (

@@ -10,10 +10,12 @@ import config from "../config";
 import { useEffect, useState } from "react";
 import CountDown from "../components/CountDown";
 import BreakPiggy from "../components/BreakPiggy";
-
+import useDebounce from "../hooks/useDebounce";
 const CountDownSection = ({ record, balance }) => {
   const { isConnected, address } = useAccount();
-  const [amount, setAmount] = useState("5000");
+  const [amount, setAmount] = useState("");
+  const debouncedAmount = useDebounce(amount, 500);
+  debouncedAmount && console.log(debouncedAmount);
   //for approving update
   const {
     config: approveConfig,
@@ -24,7 +26,10 @@ const CountDownSection = ({ record, balance }) => {
     address: config.token.address,
     abi: config.token.abi,
     functionName: "approve",
-    args: [config.contract.address, ethers.utils.parseEther("50")],
+    args: [
+      config.contract.address,
+      ethers.utils.parseEther(debouncedAmount || "0"),
+    ],
   });
   const {
     data: approveData,
@@ -40,7 +45,7 @@ const CountDownSection = ({ record, balance }) => {
   useEffect(() => {
     if (isApprovedSuccess == true) {
       console.log("Approved success");
-      update();
+      update?.();
     }
   }, [isApprovedSuccess]);
 
@@ -57,14 +62,19 @@ const CountDownSection = ({ record, balance }) => {
     overrides: {
       from: address,
     },
-    args: [ethers.utils.parseEther("50")],
+    args: [ethers.utils.parseEther(debouncedAmount || "0")],
   });
   const {
     data: updateData,
     write: update,
     isSuccess: isUpdated,
     isLoading: isUpdating,
-  } = useContractWrite(updateConfig);
+  } = useContractWrite({
+    ...updateConfig,
+    onSuccess: () => {
+      setAmount("");
+    },
+  });
   const { isSuccess: updatedSuccess, isLoading: isLoadingTx } =
     useWaitForTransaction({
       hash: updateData?.hash,
@@ -72,11 +82,10 @@ const CountDownSection = ({ record, balance }) => {
 
   const handleUpdate = () => {
     //check for balance
-    if (Number(amount) * 1 > ethers.utils.formatEther(balance)) {
+    if (!amount || amount > ethers.utils.formatEther(balance)) {
       return console.log("error");
     }
-
-    approve();
+    approve?.();
   };
 
   return (
@@ -92,7 +101,7 @@ const CountDownSection = ({ record, balance }) => {
             </span>
           </div>
 
-          <CountDown expiresAt={parseInt(record.expiresAt)} />
+          <CountDown expiresAt={parseInt(record?.expiresAt)} />
 
           <div className="flex flex-col">
             <span className="text-gray text-xs lg:text-sm ml-auto">
@@ -111,12 +120,16 @@ const CountDownSection = ({ record, balance }) => {
               className="py-3 px-0 focus:outline-none bg-transparent"
               placeholder="200"
               type="text"
-              disabled={isUpdating || isLoadingTx}
+              disabled={isUpdating || isLoadingTx || isLoadingApproveTx}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
             />
             <button
               className="bg-blue-400 hover:bg-blue-500 active:bg-blue-600 rounded-md p-3 mt-5 block w-full disabled:bg-grayed"
               onClick={() => handleUpdate()}
-              disabled={isUpdating || isLoadingTx}
+              disabled={
+                isUpdating || isLoadingTx || isLoadingApproveTx || !amount
+              }
             >
               Update
             </button>

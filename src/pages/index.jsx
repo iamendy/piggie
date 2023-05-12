@@ -1,25 +1,34 @@
 import { useAccount, useContractRead } from "wagmi";
 import Rainy from "../components/Rainy";
 import Save from "../components/Save";
-import CountDown from "../components/CountDown";
+import CountDownSection from "../components/CountDownSection";
 import Navbar from "../components/Navbar";
 import { useState } from "react";
 import AddTokens from "../components/AddTokens";
 import config from "../config";
 
 function Page() {
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const [toggle, setToggle] = useState(false);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(2);
 
-  const { data, isSuccess, isError, error } = useContractRead({
+  const {
+    data: record,
+    isSuccess,
+    isError,
+    error,
+  } = useContractRead({
     address: config.contract.address,
     abi: config.contract.abi,
+    from: address,
     functionName: "getRecord",
+    //watch: true,
+    overrides: {
+      from: address,
+    },
   });
 
-  isSuccess && console.log(data);
-  isError && console.log(error.reason);
+  record && console.log(record);
 
   return (
     <main className="relative overflow-hidden min-h-screen font-inter">
@@ -33,7 +42,11 @@ function Page() {
           </div>
         </div>
 
-        {step == 1 ? <Save /> : <CountDown />}
+        {record.status == 0 ? (
+          <Save record={record} />
+        ) : (
+          <CountDownSection record={record} />
+        )}
       </section>
       <footer className="absolute bottom-0 left-0 w-full p-5 flex justify-center items-center">
         <a

@@ -20,7 +20,8 @@
     "**/*.ts",
     "**/*.tsx",
     "src/pages/index.jsx",
-    "src/pages/_app.jsx"
+    "src/pages/_app.jsx",
+    "src/wagmi.js"
   ],
   "exclude": ["node_modules"]
 }

@@ -1,6 +1,6 @@
 const Rainy = () => {
   return (
-    <svg width="auto" height="auto" viewBox="0 0 64 64">
+    <svg viewBox="0 0 64 64">
       <defs>
         <filter id="blur" width="200%" height="200%">
           <feGaussianBlur in="SourceAlpha" stdDeviation="3" />

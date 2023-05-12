@@ -1,11 +1,18 @@
 import { getDefaultWallets } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient } from "wagmi";
-import { celoAlfajores } from "wagmi/chains";
+import { sepolia } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
+import { Alfajores } from "@celo/rainbowkit-celo/chains";
 
-const { chains, provider, webSocketProvider } = configureChains(
-  [celoAlfajores],
-  [publicProvider()]
+const { chains, provider } = configureChains(
+  [Alfajores],
+  //publicProvider(),
+  [
+    jsonRpcProvider({
+      rpc: (chain) => ({ http: "https://alfajores-forno.celo-testnet.org" }),
+    }),
+  ]
 );
 
 const { connectors } = getDefaultWallets({
@@ -17,7 +24,6 @@ export const client = createClient({
   autoConnect: true,
   connectors,
   provider,
-  webSocketProvider,
 });
 
 export { chains };

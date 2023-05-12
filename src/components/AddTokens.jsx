@@ -24,7 +24,7 @@ const AddTokens = ({ toggle, setToggle }) => {
     address: config.token.address,
     abi: config.token.abi,
     functionName: "mint",
-    args: [ethers.utils.parseEther("100")],
+    args: [ethers.utils.parseEther("10000")],
     //enabled: false,
   });
 

@@ -10,7 +10,7 @@ import config from "../config";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 
-const Save = () => {
+const Save = ({ record, isLoading }) => {
   const { openConnectModal } = useConnectModal();
   const { isConnected, address } = useAccount();
   const [amount, setAmount] = useState("");
@@ -22,14 +22,6 @@ const Save = () => {
     abi: config.token.abi,
     functionName: "balanceOf",
     args: [address],
-  });
-
-  //Get Savings Balance
-  const { data: record, isLoading: isGettingRecord } = useContractRead({
-    address: config.contract.address,
-    abi: config.contract.abi,
-    from: address,
-    functionName: "getRecord",
   });
 
   record && console.log(record);
@@ -58,7 +50,9 @@ const Save = () => {
     });
 
   useEffect(() => {
-    isApprovedSuccess ? createPiggy?.() : null;
+    if (isApprovedSuccess == true) {
+      createPiggy();
+    }
   }, [isApprovedSuccess]);
 
   const {
@@ -70,7 +64,7 @@ const Save = () => {
     address: config.contract.address,
     abi: config.contract.abi,
     functionName: "createPiggy",
-    args: [ethers.utils.parseEther("50"), parseInt(120)],
+    args: [ethers.utils.parseEther("50"), parseInt(60)],
     //enabled: false,
   });
 
@@ -87,7 +81,7 @@ const Save = () => {
           <div className="flex flex-col">
             <span className="text-gray text-xs lg:text-sm">Savings (PTK)</span>
             <span className="text-2xl lg:text-4xl font-extrabold">
-              {isGettingRecord ? (
+              {isLoading ? (
                 <p> Loading</p>
               ) : record && record.length > 0 ? (
                 ethers.utils.formatEther(record?.balance)
@@ -138,7 +132,7 @@ const Save = () => {
             {isConnected ? (
               <button
                 className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-grayed rounded-md p-5 block w-full"
-                onClick={() => createPiggy()}
+                onClick={() => approve()}
                 disabled={isLoadingTx || isWriting || isCreatingPiggy}
               >
                 Create Piggy

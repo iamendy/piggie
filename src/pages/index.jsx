@@ -1,4 +1,4 @@
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount, useContractReads, useContractRead } from "wagmi";
 import Rainy from "../components/Rainy";
 import Save from "../components/Save";
 import CountDownSection from "../components/CountDownSection";
@@ -10,25 +10,26 @@ import config from "../config";
 function Page() {
   const { isConnected, address } = useAccount();
   const [toggle, setToggle] = useState(false);
-  const [step, setStep] = useState(2);
 
-  const {
-    data: record,
-    isSuccess,
-    isError,
-    error,
-  } = useContractRead({
+  const { data: record } = useContractRead({
     address: config.contract.address,
     abi: config.contract.abi,
-    from: address,
     functionName: "getRecord",
-    //watch: true,
+    watch: true,
     overrides: {
       from: address,
     },
   });
 
-  record && console.log(record);
+  const { data: balance } = useContractRead({
+    address: config.token.address,
+    abi: config.token.abi,
+    functionName: "balanceOf",
+    args: [address],
+    watch: true,
+  });
+
+  balance && console.log(balance);
 
   return (
     <main className="relative overflow-hidden min-h-screen font-inter">
@@ -43,9 +44,9 @@ function Page() {
         </div>
 
         {record.status == 0 ? (
-          <Save record={record} />
+          <Save record={record} balance={balance} />
         ) : (
-          <CountDownSection record={record} />
+          <CountDownSection record={record} balance={balance} />
         )}
       </section>
       <footer className="absolute bottom-0 left-0 w-full p-5 flex justify-center items-center">

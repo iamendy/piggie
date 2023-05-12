@@ -3,7 +3,6 @@ import {
   usePrepareContractWrite,
   useContractWrite,
   useWaitForTransaction,
-  useContractRead,
 } from "wagmi";
 import { ethers } from "ethers";
 import config from "../config";
@@ -11,18 +10,16 @@ import { useEffect, useState } from "react";
 import CountDown from "../components/CountDown";
 import BreakPiggy from "../components/BreakPiggy";
 import useDebounce from "../hooks/useDebounce";
+import Loader from "./icons/Loader";
+import { toast } from "react-hot-toast";
+
 const CountDownSection = ({ record, balance }) => {
   const { isConnected, address } = useAccount();
   const [amount, setAmount] = useState("");
   const debouncedAmount = useDebounce(amount, 500);
-  debouncedAmount && console.log(debouncedAmount);
+
   //for approving update
-  const {
-    config: approveConfig,
-    isApproveFetching,
-    isApproveError,
-    approveError,
-  } = usePrepareContractWrite({
+  const { config: approveConfig } = usePrepareContractWrite({
     address: config.token.address,
     abi: config.token.abi,
     functionName: "approve",
@@ -34,7 +31,6 @@ const CountDownSection = ({ record, balance }) => {
   const {
     data: approveData,
     write: approve,
-    isSuccess: isApproved,
     isLoading: isApproving,
   } = useContractWrite(approveConfig);
   const { isSuccess: isApprovedSuccess, isLoading: isLoadingApproveTx } =
@@ -44,18 +40,12 @@ const CountDownSection = ({ record, balance }) => {
 
   useEffect(() => {
     if (isApprovedSuccess == true) {
-      console.log("Approved success");
       update?.();
     }
   }, [isApprovedSuccess]);
 
   //for updating piggie
-  const {
-    config: updateConfig,
-    isFetching,
-    isError,
-    error,
-  } = usePrepareContractWrite({
+  const { config: updateConfig } = usePrepareContractWrite({
     address: config.contract.address,
     abi: config.contract.abi,
     functionName: "updateBalance",
@@ -67,23 +57,34 @@ const CountDownSection = ({ record, balance }) => {
   const {
     data: updateData,
     write: update,
-    isSuccess: isUpdated,
     isLoading: isUpdating,
-  } = useContractWrite({
-    ...updateConfig,
+  } = useContractWrite(updateConfig);
+  const { isLoading: isLoadingTx } = useWaitForTransaction({
+    hash: updateData?.hash,
     onSuccess: () => {
       setAmount("");
+      toast.success("Updated Successfully 🔐", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
     },
   });
-  const { isSuccess: updatedSuccess, isLoading: isLoadingTx } =
-    useWaitForTransaction({
-      hash: updateData?.hash,
-    });
 
   const handleUpdate = () => {
     //check for balance
-    if (!amount || amount > ethers.utils.formatEther(balance)) {
-      return console.log("error");
+    console.log(amount, ethers.utils.formatEther(balance));
+    if (!amount || Number(amount) > ethers.utils.formatEther(balance)) {
+      return toast.error("insufficient token balance", {
+        id: "error",
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
     }
     approve?.();
   };
@@ -125,13 +126,31 @@ const CountDownSection = ({ record, balance }) => {
               onChange={(e) => setAmount(e.target.value)}
             />
             <button
-              className="bg-blue-400 hover:bg-blue-500 active:bg-blue-600 rounded-md p-3 mt-5 block w-full disabled:bg-grayed"
+              className="bg-blue-400 hover:bg-blue-500 active:bg-blue-600 rounded-md p-3 mt-5 w-full disabled:bg-grayed flex items-center justify-center"
               onClick={() => handleUpdate()}
               disabled={
-                isUpdating || isLoadingTx || isLoadingApproveTx || !amount
+                isUpdating ||
+                isLoadingTx ||
+                isLoadingApproveTx ||
+                isApproving ||
+                !amount
               }
             >
-              Update
+              {isUpdating ||
+              isLoadingTx ||
+              isLoadingApproveTx ||
+              isApproving ? (
+                <>
+                  <Loader />
+                  <span>
+                    {isApproving || isLoadingApproveTx
+                      ? "Approving"
+                      : "Updating"}
+                  </span>
+                </>
+              ) : (
+                "Update"
+              )}
             </button>
           </div>
 

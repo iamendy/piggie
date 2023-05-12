@@ -10,9 +10,10 @@ import config from "../config";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import useDebounce from "../hooks/useDebounce";
-import Loader from "../components/icons/Loader";
+import Loader from "./icons/Loader";
 import { toast } from "react-hot-toast";
-const Save = ({ record, balance }) => {
+
+const NewPiggieSection = ({ record, balance }) => {
   const { openConnectModal } = useConnectModal();
   const { isConnected, address } = useAccount();
   const [amount, setAmount] = useState("");
@@ -111,7 +112,9 @@ const Save = ({ record, balance }) => {
               className="py-3 px-0 focus:outline-none bg-transparent"
               placeholder="200"
               type="text"
-              disabled={isLoadingTx || isWriting || !isConnected}
+              disabled={
+                isLoadingTx || isWriting || !isConnected || isCreationTx
+              }
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
             />
@@ -123,7 +126,9 @@ const Save = ({ record, balance }) => {
               className="py-3 px-0 focus:outline-none bg-transparent"
               placeholder="5 days"
               type="text"
-              disabled={isLoadingTx || isWriting || !isConnected}
+              disabled={
+                isLoadingTx || isWriting || !isConnected || isCreationTx
+              }
               value={duration}
               onChange={(e) => setDuration(e.target.value)}
             />
@@ -134,7 +139,9 @@ const Save = ({ record, balance }) => {
               <button
                 className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-grayed rounded-md p-5 flex justify-center items-center w-full"
                 onClick={() => handleApprove()}
-                disabled={isLoadingTx || isWriting || isCreatingPiggy}
+                disabled={
+                  isLoadingTx || isWriting || isCreatingPiggy || isCreationTx
+                }
               >
                 {isLoadingTx || isWriting || isCreatingPiggy || isCreationTx ? (
                   <>
@@ -165,4 +172,4 @@ const Save = ({ record, balance }) => {
     </div>
   );
 };
-export default Save;
+export default NewPiggieSection;

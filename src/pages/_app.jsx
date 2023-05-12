@@ -1,11 +1,11 @@
 import "@rainbow-me/rainbowkit/styles.css";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import NextHead from "next/head";
+import SEOHead from "../components/SeoHead";
 import * as React from "react";
 import { WagmiConfig } from "wagmi";
 import { chains, client } from "../wagmi";
 import "../styles/globals.css";
-import { Inter, Slackey } from "next/font/google";
+import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
@@ -20,10 +20,7 @@ function App({ Component, pageProps }) {
   return (
     <WagmiConfig client={client}>
       <RainbowKitProvider chains={chains} modalSize="compact">
-        <NextHead>
-          <title>Piggie</title>
-        </NextHead>
-
+        <SEOHead href="https://piggie.vercel.app" />
         {mounted && (
           <main className={`${inter.variable}`}>
             <Toaster />

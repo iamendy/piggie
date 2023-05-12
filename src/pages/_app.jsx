@@ -6,6 +6,7 @@ import { WagmiConfig } from "wagmi";
 import { chains, client } from "../wagmi";
 import "../styles/globals.css";
 import { Inter, Slackey } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,6 +26,7 @@ function App({ Component, pageProps }) {
 
         {mounted && (
           <main className={`${inter.variable}`}>
+            <Toaster />
             <Component {...pageProps} />
           </main>
         )}

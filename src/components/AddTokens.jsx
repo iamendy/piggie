@@ -11,6 +11,8 @@ import {
 } from "wagmi";
 import { useState } from "react";
 import useDebounce from "../hooks/useDebounce";
+import Loader from "./icons/Loader";
+import { toast } from "react-hot-toast";
 
 const AddTokens = ({ toggle, setToggle }) => {
   const { disconnect } = useDisconnect();
@@ -40,8 +42,21 @@ const AddTokens = ({ toggle, setToggle }) => {
     onSuccess: () => {
       setAmount("");
       setToggle(!toggle);
+      toast.success("Mint Successful 🥳", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
     },
   });
+
+  const handleMint = () => {
+    if (amount) {
+      mint?.();
+    }
+  };
 
   return (
     <section
@@ -70,11 +85,17 @@ const AddTokens = ({ toggle, setToggle }) => {
           <div>
             {isConnected ? (
               <button
-                className="bg-blue-400 hover:bg-blue-500 active:bg-blue-600 disabled:bg-grayed rounded-md p-3 block w-full"
-                onClick={() => mint()}
+                className="bg-blue-400 hover:bg-blue-500 active:bg-blue-600 disabled:bg-grayed rounded-md flex items-center justify-center p-3 w-full"
+                onClick={() => handleMint()}
                 disabled={isMinting}
               >
-                {isMinting ? "Minting.." : "Mint"}
+                {isMinting ? (
+                  <>
+                    <Loader /> <span>Minting..</span>
+                  </>
+                ) : (
+                  "Mint"
+                )}
               </button>
             ) : (
               openConnectModal && (

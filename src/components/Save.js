@@ -10,7 +10,8 @@ import config from "../config";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import useDebounce from "../hooks/useDebounce";
-
+import Loader from "../components/icons/Loader";
+import { toast } from "react-hot-toast";
 const Save = ({ record, balance }) => {
   const { openConnectModal } = useConnectModal();
   const { isConnected, address } = useAccount();
@@ -19,12 +20,7 @@ const Save = ({ record, balance }) => {
   const debouncedAmount = useDebounce(amount, 500);
   const debouncedDuration = useDebounce(duration, 500);
 
-  const {
-    config: approveConfig,
-    isFetching,
-    isError,
-    error,
-  } = usePrepareContractWrite({
+  const { config: approveConfig } = usePrepareContractWrite({
     address: config.token.address,
     abi: config.token.abi,
     functionName: "approve",
@@ -36,7 +32,6 @@ const Save = ({ record, balance }) => {
   const {
     data: approveData,
     write: approve,
-    isSuccess: isApproved,
     isLoading: isWriting,
   } = useContractWrite(approveConfig);
   const { isSuccess: isApprovedSuccess, isLoading: isLoadingTx } =
@@ -50,12 +45,7 @@ const Save = ({ record, balance }) => {
     }
   }, [isApprovedSuccess]);
 
-  const {
-    config: createConfig,
-    isFetching: isFetchingP,
-    isError: isErrorP,
-    error: errorP,
-  } = usePrepareContractWrite({
+  const { config: createConfig } = usePrepareContractWrite({
     address: config.contract.address,
     abi: config.contract.abi,
     functionName: "createPiggy",
@@ -66,10 +56,30 @@ const Save = ({ record, balance }) => {
   });
 
   const {
+    data: createdData,
     write: createPiggy,
     isLoading: isCreatingPiggy,
-    isSuccess: isCreated,
-  } = useContractWrite(createConfig);
+  } = useContractWrite({
+    ...createConfig,
+  });
+  const { isFetching: isCreationTx } = useWaitForTransaction({
+    hash: createdData?.hash,
+    onSuccess: () => {
+      toast.success("Added Successful 🔐", {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+    },
+  });
+
+  const handleApprove = () => {
+    if (amount && duration) {
+      approve?.();
+    }
+  };
 
   return (
     <div className="w-[90%] lg:max-w-2xl mx-auto">
@@ -122,13 +132,22 @@ const Save = ({ record, balance }) => {
           <div>
             {isConnected ? (
               <button
-                className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-grayed rounded-md p-5 block w-full"
-                onClick={() => approve?.()}
+                className="bg-blue-500 hover:bg-blue-600 active:bg-blue-700 disabled:bg-grayed rounded-md p-5 flex justify-center items-center w-full"
+                onClick={() => handleApprove()}
                 disabled={isLoadingTx || isWriting || isCreatingPiggy}
               >
-                {isLoadingTx || isWriting || isCreatingPiggy
-                  ? "Creating Piggy.."
-                  : "Create Piggy"}
+                {isLoadingTx || isWriting || isCreatingPiggy || isCreationTx ? (
+                  <>
+                    <Loader />
+                    <span>
+                      {isCreatingPiggy || isCreationTx
+                        ? "Creating Piggie"
+                        : "Approving"}
+                    </span>
+                  </>
+                ) : (
+                  "Create Piggy"
+                )}
               </button>
             ) : (
               openConnectModal && (

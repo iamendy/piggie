@@ -24,7 +24,7 @@ const Navbar = ({ toggle, setToggle }) => {
         onClick={() => setToggle(!toggle)}
       >
         <Rack />
-        <span>Add Token</span>
+        <span>Get Tokens</span>
       </span>
     </nav>
   );

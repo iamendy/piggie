@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar";
 import { useState } from "react";
 import AddTokens from "../components/AddTokens";
 import config from "../config";
+import Loader from "../components/icons/Loader";
 
 function Page() {
   const { isConnected, address } = useAccount();
@@ -34,8 +35,10 @@ function Page() {
       <Navbar setToggle={setToggle} toggle={toggle} />
       <AddTokens toggle={toggle} setToggle={setToggle} />
       <section className="relative">
-        <div className="flex flex-col justify-center items-center my-9">
-          <h1 className="text-gray">Save for the rainy day</h1>
+        <div className="flex flex-col justify-center items-center">
+          <h1 className="text-gray text-center">
+            Your decentralized Piggy bank. <br /> Save for the rainy day
+          </h1>
           <div className="w-32 h-32">
             <Rainy />
           </div>
@@ -43,8 +46,16 @@ function Page() {
 
         {record?.status == 0 ? (
           <Save record={record} balance={balance} />
-        ) : (
+        ) : record?.status == 1 ? (
           <CountDownSection record={record} balance={balance} />
+        ) : (
+          <div className="w-[90%] lg:max-w-2xl mx-auto">
+            <div className="p-5 bg-dark rounded-md lg:p-8 xl:p-9 min-h-[9rem]">
+              <div className="flex justify-center items-center">
+                <Loader />
+              </div>
+            </div>
+          </div>
         )}
       </section>
       <footer className="absolute bottom-0 left-0 w-full p-5 flex justify-center items-center">

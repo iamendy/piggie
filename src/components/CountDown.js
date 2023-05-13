@@ -11,7 +11,7 @@ const CountDown = ({ expiresAt }) => {
             Countdown
           </span>
           <span className="text-2xl lg:text-4xl font-extrabold ml-auto">
-            0.0.0
+            0:0:0
           </span>
         </div>
       ) : (
@@ -20,7 +20,7 @@ const CountDown = ({ expiresAt }) => {
             Countdown
           </span>
           <span className="text-2xl lg:text-4xl font-extrabold ml-auto">
-            {days}.{hours}.{minutes}.{seconds}
+            {days}:{hours}:{minutes}:{seconds}
           </span>
         </div>
       )}

@@ -34,19 +34,29 @@ const NewPiggieSection = ({ record, balance }) => {
     data: approveData,
     write: approve,
     isLoading: isWriting,
+    isFetching,
   } = useContractWrite(approveConfig);
-  const { isSuccess: isApprovedSuccess, isLoading: isLoadingTx } =
-    useWaitForTransaction({
-      hash: approveData?.hash,
-    });
-
-  useEffect(() => {
-    if (isApprovedSuccess == true) {
+  console.log(approveData);
+  const { isLoading: isLoadingTx } = useWaitForTransaction({
+    hash: approveData?.hash,
+    confirmations: 1,
+    onError(e) {
+      toast.error(e.reason, {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+    },
+    onSuccess: () => {
+      console.log("here");
+      refetch?.();
       createPiggy?.();
-    }
-  }, [isApprovedSuccess]);
+    },
+  });
 
-  const { config: createConfig } = usePrepareContractWrite({
+  const { config: createConfig, refetch } = usePrepareContractWrite({
     address: config.contract.address,
     abi: config.contract.abi,
     functionName: "createPiggy",

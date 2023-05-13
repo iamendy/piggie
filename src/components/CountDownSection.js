@@ -33,22 +33,22 @@ const CountDownSection = ({ record, balance }) => {
     write: approve,
     isLoading: isApproving,
   } = useContractWrite(approveConfig);
-  const { isSuccess: isApprovedSuccess, isLoading: isLoadingApproveTx } =
-    useWaitForTransaction({
-      hash: approveData?.hash,
-    });
-
-  useEffect(() => {
-    if (isApprovedSuccess == true) {
+  //approveData && console.log(approveData);
+  const { isLoading: isLoadingApproveTx } = useWaitForTransaction({
+    hash: approveData?.hash,
+    onSuccess: () => {
+      refetch?.();
       update?.();
-    }
-  }, [isApprovedSuccess]);
+    },
+  });
+  //isApprovedSuccess && console.log("has approved");
 
   //for updating piggie
-  const { config: updateConfig } = usePrepareContractWrite({
+  const { config: updateConfig, refetch } = usePrepareContractWrite({
     address: config.contract.address,
     abi: config.contract.abi,
     functionName: "updateBalance",
+    //enabled: false,
     overrides: {
       from: address,
     },
@@ -61,6 +61,16 @@ const CountDownSection = ({ record, balance }) => {
   } = useContractWrite(updateConfig);
   const { isLoading: isLoadingTx } = useWaitForTransaction({
     hash: updateData?.hash,
+    confirmations: 1,
+    onError(e) {
+      toast.error(e.reason, {
+        style: {
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
+        },
+      });
+    },
     onSuccess: () => {
       setAmount("");
       toast.success("Updated Successfully 🔐", {
@@ -74,8 +84,6 @@ const CountDownSection = ({ record, balance }) => {
   });
 
   const handleUpdate = () => {
-    //check for balance
-    console.log(amount, ethers.utils.formatEther(balance));
     if (!amount || Number(amount) > ethers.utils.formatEther(balance)) {
       return toast.error("insufficient token balance", {
         id: "error",

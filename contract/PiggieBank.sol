@@ -50,7 +50,7 @@ contract PiggyBank {
     //get the token contract and transfer
     IERC20(piggyTokenAddress).transferFrom(msg.sender, address(this), _amount);
 
-    uint expiresAt = block.timestamp + _duration;
+    uint expiresAt = block.timestamp + (_duration * 86400); //convert to days
     records[msg.sender] = Account({
       balance: _amount,
       status: Status.ACTIVE,
@@ -104,7 +104,7 @@ contract PiggyBank {
 }
 
 contract PiggyToken is ERC20, Ownable {
-  constructor() ERC20("Piggy Tokens", "PTK") {}
+  constructor() ERC20("Piggy Token", "PTK") {}
 
   function mint(uint256 amount) external {
     _mint(msg.sender, amount);

@@ -6,7 +6,7 @@ import {
 } from "wagmi";
 import { ethers } from "ethers";
 import config from "../config";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CountDown from "../components/CountDown";
 import BreakPiggy from "../components/BreakPiggy";
 import useDebounce from "../hooks/useDebounce";
@@ -35,20 +35,19 @@ const CountDownSection = ({ record, balance }) => {
   } = useContractWrite(approveConfig);
   //approveData && console.log(approveData);
   const { isLoading: isLoadingApproveTx } = useWaitForTransaction({
+    confirmations: 2,
     hash: approveData?.hash,
     onSuccess: () => {
       refetch?.();
       update?.();
     },
   });
-  //isApprovedSuccess && console.log("has approved");
 
   //for updating piggie
   const { config: updateConfig, refetch } = usePrepareContractWrite({
     address: config.contract.address,
     abi: config.contract.abi,
     functionName: "updateBalance",
-    //enabled: false,
     overrides: {
       from: address,
     },

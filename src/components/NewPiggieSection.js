@@ -36,10 +36,10 @@ const NewPiggieSection = ({ record, balance }) => {
     isLoading: isWriting,
     isFetching,
   } = useContractWrite(approveConfig);
-  console.log(approveData);
+
   const { isLoading: isLoadingTx } = useWaitForTransaction({
     hash: approveData?.hash,
-    confirmations: 1,
+    confirmations: 2,
     onError(e) {
       toast.error(e.reason, {
         style: {
@@ -50,7 +50,6 @@ const NewPiggieSection = ({ record, balance }) => {
       });
     },
     onSuccess: () => {
-      console.log("here");
       refetch?.();
       createPiggy?.();
     },

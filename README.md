@@ -1,6 +1,6 @@
 ## About Piggie
 
-Piggie is dApp that connects to a Piggie Bank smart contract i wrote to teach Solidity development on the [Celo](https://https://celo.org/) blockchain.
+Piggie is a dApp that connects to a Piggie Bank smart contract i wrote to teach Solidity development on the [Celo](https://https://celo.org/) blockchain.
 
 ## App
 

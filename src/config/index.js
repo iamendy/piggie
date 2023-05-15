@@ -1,6 +1,6 @@
 const config = {
   contract: {
-    address: "0x0fC5025C764cE34df352757e82f7B5c4Df39A836",
+    address: "0x42Cc2F72a56cA89ACed7293242231c4a9a113CB5",
     abi: [
       {
         inputs: [
@@ -177,7 +177,7 @@ const config = {
     ],
   },
   token: {
-    address: "0xddaAd340b0f1Ef65169Ae5E41A8b10776a75482d",
+    address: "0x5Ad8D4482E6720c2d58229F41Ff25fb2B3656d32",
     abi: [
       {
         inputs: [],

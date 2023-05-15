@@ -1,17 +1,18 @@
 import Rack from "../components/icons/Rack";
 import { useAccount, useNetwork } from "wagmi";
-import { useChainModal } from "@rainbow-me/rainbowkit";
+import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
 
 const Navbar = ({ toggle, setToggle }) => {
   const { isConnected } = useAccount();
   const { openChainModal } = useChainModal();
+  const { openConnectModal } = useConnectModal();
   const { chain } = useNetwork();
 
   return (
     <nav className="relative flex items-center justify-between p-3 lg:max-w-6xl xl:max-w-7xl mx-auto">
       <h3 className="font-bold tracking-loose text-xl uppercase p-4">Piggie</h3>
 
-      {openChainModal && (
+      {openChainModal ? (
         <div
           onClick={openChainModal}
           className=" cursor-pointer flex items-center justify-center bg-dark rounded-md p-1 space-x-1"
@@ -33,6 +34,15 @@ const Navbar = ({ toggle, setToggle }) => {
             }`}
           ></div>
         </div>
+      ) : (
+        !isConnected && (
+          <div
+            className=" cursor-pointer flex items-center justify-center bg-dark rounded-md p-1 space-x-1"
+            onClick={openConnectModal}
+          >
+            connect 🌍
+          </div>
+        )
       )}
       <span
         className={`flex items-center space-x-2 cursor-pointer lg:hover:text-blue-300 ${
